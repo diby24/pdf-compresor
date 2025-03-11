@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Compressor</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        input, button { margin: 10px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Upload a PDF to Compress</h2>
+    <input type="file" id="pdfFile" accept="application/pdf">
+    <button onclick="uploadFile()">Compress PDF</button>
+    <p id="status"></p>
+
+    <script>
+        function uploadFile() {
+            let fileInput = document.getElementById("pdfFile");
+            if (fileInput.files.length === 0) {
+                alert("Please select a PDF file.");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("pdf", fileInput.files[0]);
+
+            fetch("/compress", { method: "POST", body: formData })
+                .then(response => response.blob())
+                .then(blob => {
+                    let url = window.URL.createObjectURL(blob);
+                    let a = document.createElement("a");
+                    a.href = url;
+                    a.download = "compressed.pdf";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    document.getElementById("status").innerText = "Compression Complete!";
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
